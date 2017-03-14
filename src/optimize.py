@@ -1,9 +1,11 @@
 from __future__ import print_function
 import functools
+import random
 import vgg, pdb, time
 import tensorflow as tf, numpy as np, os
 import transform
 from utils import get_img
+from tqdm import tqdm
 
 STYLE_LAYERS = ('relu1_1', 'relu2_1', 'relu3_1', 'relu4_1', 'relu5_1')
 CONTENT_LAYER = 'relu4_2'
@@ -95,8 +97,13 @@ def optimize(content_targets, style_target, content_weight, style_weight,
         print("UID: %s" % uid)
         for epoch in range(epochs):
             num_examples = len(content_targets)
-            iterations = 0
-            while iterations * batch_size < num_examples:
+            random.shuffle(content_targets)
+            print('shuffled')
+	    if debug:
+                wrapper = lambda x: tqdm(x)
+            else:
+                wrapper = lambda x: x
+            for iterations in wrapper(range(num_examples//batch_size)):
                 start_time = time.time()
                 curr = iterations * batch_size
                 step = curr + batch_size
@@ -104,7 +111,6 @@ def optimize(content_targets, style_target, content_weight, style_weight,
                 for j, img_p in enumerate(content_targets[curr:step]):
                    X_batch[j] = get_img(img_p, (256,256,3)).astype(np.float32)
 
-                iterations += 1
                 assert X_batch.shape[0] == batch_size
 
                 feed_dict = {
@@ -114,8 +120,6 @@ def optimize(content_targets, style_target, content_weight, style_weight,
                 train_step.run(feed_dict=feed_dict)
                 end_time = time.time()
                 delta_time = end_time - start_time
-                if debug:
-                    print("UID: %s, batch time: %s" % (uid, delta_time))
                 is_print_iter = int(iterations) % print_iterations == 0
                 if slow:
                     is_print_iter = epoch % print_iterations == 0

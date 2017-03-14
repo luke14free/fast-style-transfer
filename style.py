@@ -121,6 +121,7 @@ def main():
         content_targets = [options.test]
 
     kwargs = {
+	"debug": True,
         "slow":options.slow,
         "epochs":options.epochs,
         "print_iterations":options.checkpoint_iterations,
@@ -143,10 +144,10 @@ def main():
         options.tv_weight,
         options.vgg_path
     ]
-
+    print("here")
     for preds, losses, i, epoch in optimize(*args, **kwargs):
         style_loss, content_loss, tv_loss, loss = losses
-
+	print("FIGA")
         print('Epoch %d, Iteration: %d, Loss: %s' % (epoch, i, loss))
         to_print = (style_loss, content_loss, tv_loss)
         print('style: %s, content:%s, tv: %s' % to_print)
