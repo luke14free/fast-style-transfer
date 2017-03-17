@@ -22,8 +22,11 @@ def get_img(src, img_size=False):
        img = scipy.misc.imresize(img, img_size)
    return img
 
-def get_img_bordered(src, img_size=False, border_size = BORDER_SIZE):
+def get_img_bordered(src, img_size=False, border_size=BORDER_SIZE):
    img = scipy.misc.imread(src, mode='RGB') # misc.imresize(, (256, 256, 3))
+   return border_image(img, img_size=img_size, border_size=border_size)
+
+def border_img(img, img_size=False, border_size=BORDER_SIZE):
    img = scipy.pad(img, ((border_size,border_size),(border_size,border_size),(0,0)), mode='reflect')
    if not (len(img.shape) == 3 and img.shape[2] == 3):
        img = np.dstack((img,img,img))
@@ -42,5 +45,5 @@ def list_files(in_path):
 
     return files
 
-def crop_img(img, border_size = BORDER_SIZE):
-   return img[border_size: -border_size, border_size: -border_size]
+def crop_img(img, border_size=BORDER_SIZE):
+    return img[border_size: -border_size, border_size: -border_size]
